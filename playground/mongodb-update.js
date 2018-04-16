@@ -35,7 +35,7 @@ MongoClient.connect("mongodb://localhost:27017/TodoApp", (err, db) => {//this co
     db.collection('Users').findOneAndUpdate({
     age: 25
 }, {
-    $inc: {
+    $inc: { //this increment the age by 1
         age: 1,
         "metrics.orders": 1
     }

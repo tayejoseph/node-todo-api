@@ -1,6 +1,6 @@
 // const MongoClient = require('mongodb').MongoClient;
 
-const {MongoClient, ObjectID} = require('mongodb'); //this code is identical to the code up above but it access the MongoClient props, and the ObjectID for mangodb
+const {MongoClient, ObjectID} = require('mongodb'); //this code is identical to the code up above but it access the MongoClient props, and the ObjectID for each data in the mongoose database
 
 MongoClient.connect("mongodb://localhost:27017/TodoApp", (err, db) => {//this connect our data to the database
 if(err) {

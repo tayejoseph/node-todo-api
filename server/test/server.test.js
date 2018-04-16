@@ -4,8 +4,17 @@ const request = require('supertest');
 const {app} = require('./../server');
 const {Todo} = require("./../models/todo");
 
+const todos = [{
+    text: "First test todo"
+}, {
+    text: "Second test todo"
+}];
+
 beforeEach((done) => { //this runs before every single test case
-    Todo.remove({}).then(() => done()); //this will make our database empty before every request
+    Todo.remove({}).then(() => {
+        // Todo.remove({}).then(() => done()); //this will make our database empty before every request
+       return  Todo.insertMany(todos); //this insert some text bo our todo
+    }).then(() => done());
 });
 
 describe("POST /todos", () => {
@@ -24,7 +33,7 @@ describe("POST /todos", () => {
                 return done(err);
             }
             //this check if the value was actually saved in the database
-            Todo.find().then((todos) => {
+            Todo.find({text}).then((todos) => {
                 expect(todos.length).toBe(1);
                 expect(todos[0].text).toBe(text);
                 done();
@@ -42,9 +51,22 @@ describe("POST /todos", () => {
                 return done(err);
             }
             Todo.find().then((todos) => {
-                expect(todos.length).toBe(0);
+                expect(todos.length).toBe(2);
                 done();
             }).catch((e) => done(e));
         })
     })
+});
+
+
+describe("GET /todos", () => {
+    it("Should get all todos", (done) => {
+        request(app)
+        .get("/todos")
+        .expect(200)
+        .expect((res) => {
+            expect(res.body.todos.lenght).toBe(2);
+        })
+        .end(done);
+    });
 });
