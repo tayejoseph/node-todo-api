@@ -6,7 +6,7 @@ const {User} = require("./../server/models/user");
 
 const id = "5ad1dc95757ced15cc5c299ba"; //note we call the id as a string
 
-if(!ObjectID.isValid(id)) { //this is used to check if the id is valid with the one in the database
+if(!ObjectID.isValid(id)) { //this is used to check if the id is valid with the id mongose creates
     console.log("ID not valid");
 };
 // Todo.find({
@@ -25,10 +25,10 @@ if(!ObjectID.isValid(id)) { //this is used to check if the id is valid with the 
 
 // Todo.findById(id).then((todos) => {
 //     if(!todos) {
-//         return console.log("Id not found!") //this runs is the id was valid but not found
+//         return console.log("Id not found!") //this runs is the id was valid with the id mongoos creates but not found
 //     }
 //     console.log("Todos By Id", todos);
-// }).catch((e) => console.log(e) //this runs is the id is invalid which is rturn what the isValid func
+// }).catch((e) => console.log(e) //this runs if the id is invalid which is rturn what the isValid func
 // above returns);//this will return null if the id was not found
 
 
