@@ -1,3 +1,5 @@
+require("./config/config"); //in the config file we configure different database for testing and development
+
 const _ = require("lodash");
 const { ObjectID } = require('mongodb'); //this contains all the valid id that mongoose accepts for our database
 const express = require('express');
