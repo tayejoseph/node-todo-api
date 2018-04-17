@@ -15,7 +15,7 @@ const todos = [{
 
 beforeEach((done) => { //this runs before every single test case
     Todo.remove({}).then(() => {
-        // Todo.remove({}).then(() => done()); //this will make our database empty before every request
+// Todo.remove({}).then(() => done()); //this will make our database empty before every request
     return  Todo.insertMany(todos); //this insert some text bo our todo
     }).then(() => done());
 });

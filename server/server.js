@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const { ObjectID } = require('mongodb'); //this contains all the valid id that mongoose accepts for our database
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -65,7 +66,37 @@ app.delete('/todos/:id', (req, res) => {
     }).catch((err) => {
         res.status(400).send()
     })
-})
+});
+
+//UPDATING OUR TODOS
+app.patch("/todos/:id", (req, res) => { 
+    const id = req.params.id;
+    const body = _.pick(req.body, ['text', 'completed']); //this is used to pick the properties we want the user to be able to update from our database
+    if (!ObjectID.isValid(id)) {
+        return res.status(404).send(`The id ${id} is not valid`)
+    }
+
+    if(_.isBoolean(body.completed) && body.completed){ //this check if the body.completed is a boolean and if it is set to true
+        body.completedAt = new Date().getTime() //this creates and set a completedAt props to the current time if our completed value is true
+    } else { //this runs if completed is false
+        body.completed = false;
+        body.completedAt = null; //this removes the completed at value from the database
+    }
+
+    Todo.findByIdAndUpdate(id, {$set: body}, {new: true  // with new set to be true it will return the updated value not the old one
+    }).then(() => {
+        if(!todo){ //if todo does not exist
+            return res.status(404).send();
+        }
+        res.send({todo});
+    }).catch((e) => {
+        res.status(400).send();
+    })
+
+});
+
+
+
 
 app.listen(port, () => {
 console.log(`Started up at port ${port}`);
