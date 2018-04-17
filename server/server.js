@@ -61,7 +61,7 @@ app.delete('/todos/:id', (req, res) => {
         if(!todo){//this run if the todo id in valid but is not found which my be as a result of u deleting it before
             return res.status(404).send()
         }
-        res.send(todo); //this run if a tdo was found and also was deleted
+        res.send({todo}); //this run if a tdo was found and also was deleted
     }).catch((err) => {
         res.status(400).send()
     })

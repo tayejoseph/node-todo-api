@@ -16,14 +16,13 @@ const todos = [{
 beforeEach((done) => { //this runs before every single test case
     Todo.remove({}).then(() => {
         // Todo.remove({}).then(() => done()); //this will make our database empty before every request
-       return  Todo.insertMany(todos); //this insert some text bo our todo
+    return  Todo.insertMany(todos); //this insert some text bo our todo
     }).then(() => done());
 });
 
 describe("POST /todos", () => {
     it("Should create a new todo", (done) => {
         const text = "Test todo text";
-
         request(app)
         .post('/todos')
         .send({text})//this is the data we send to the db
@@ -93,10 +92,47 @@ describe("GEt /todos/:id", () => {
             .end(done);
         });
 
-        it("Shoud return 404 for non object IDs", () => {
+        it("Shoud return 404 for non object IDs", (done) => {
             request(app)
             .get("/todos/123abc")
             .expect(404)
             .end(done);
         });
+});
+
+describe("DELETE /todos/:id", () => {
+    it('Should remove a todo', (done) => {
+        const hexId = todos[1]._id.toHexString(); //this is used to get the second todo id above
+        request(app)
+        .delete(`/todos/${hexId}`)
+        .expect(200)
+        .expect((res) => {
+            expect(res.body.todo._id).toBe(hexId);
+        })
+        .end((err, res) => {
+            if(err){
+                return done(err)
+            }
+            Todo.findById(hexId).then((todo) => { //note by this time todo is already set to be null
+                expect(todo).toNotExist();
+                done();
+            }).catch((e) => done(e));
+        })
+    });
+
+    it("Should return 404 if todo not found", (done) => {
+        const hexId = new ObjectID.toHexString() //this convert our id value to a string
+        request(app)
+            .delete(`/todos/${hexId}`)
+            .expect(404)
+            .end(done);
+    });
+
+    it("Should return 404 if the object id is invalid", (done) => {
+        request(app)
+            .delete("/todos/123abc")
+            .expect(404)
+            .end(done);
+    });
+    
 })
