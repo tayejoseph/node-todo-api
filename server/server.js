@@ -3,9 +3,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const {mangoose} = require('./db/mongoose'); //this is the database
-const { User } = require("./../server/models/user");
+// const { User } = require("./../server/models/user");
 const {Todo} = require('./models/todo');
-const {user} = require('./models/user');
+const { User} = require('./models/user');
 
 const app = express();
 const port = process.env.PORT || 3000; //this uses heroku if eroku is not found the it will use our local port 3000
@@ -38,7 +38,7 @@ app.get("/todos", (req, res) => {
 app.get("/todos/:id", (req, res) => { 
     // res.send(req.params)//this shows the value of the params objects on screen
     const id = req.params.id;
-    if(!ObjectID.isValid(id)){
+    if(!ObjectID.isValid(id)){ //this check if the id is valid
         return res.status(404).send(`the id ${id} is invalid`);
     }
     User.findById(id).then((user) => {
