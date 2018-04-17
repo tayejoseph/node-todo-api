@@ -41,11 +41,11 @@ app.get("/todos/:id", (req, res) => {
     if(!ObjectID.isValid(id)){ //this check if the id is valid
         return res.status(404).send(`the id ${id} is invalid`);
     }
-    User.findById(id).then((user) => {
-        if(!user) {
-            return res.status(404).send("The id is valid but not found")//this run if the id is a valid mongoose id but not correct
+    Todo.findById(id).then((todo) => {
+        if(!todo) {
+             res.status(404).send("The id is valid but not found")//this run if the id is a valid mongoose id but not correct
         }
-        res.send({user}) //this prints the id with its data to the user
+        res.send({todo}) //this prints the id with its data to the user
     }).catch((err) => { //this run is the id is not a valid mongoose id
         console.log(err) //this catches the error from the isValid func 
     })
