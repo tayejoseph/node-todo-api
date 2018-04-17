@@ -8,6 +8,7 @@ const {Todo} = require('./models/todo');
 const {user} = require('./models/user');
 
 const app = express();
+const port = process.env.PORT || 3000; //this uses heroku if eroku is not found the it will use our local port 3000
 
 app.use(bodyParser.json()) //this is the middleware we give to express
 
@@ -51,8 +52,8 @@ app.get("/todos/:id", (req, res) => {
 });
 
 
-app.listen(3000, () => {
-console.log("Started on port 3000")
+app.listen(port, () => {
+console.log(`Started up at port ${port}`);
 });
 
 module.exports = {app}; //this is being use for testing
