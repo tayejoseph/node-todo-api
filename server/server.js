@@ -11,7 +11,7 @@ const {Todo} = require('./models/todo');
 const { User} = require('./models/user');
 
 const app = express();
-const port = process.env.PORT || 3000; //this uses heroku if eroku is not found the it will use our local port 3000
+const port = process.env.PORT || 3000; //this uses heroku if heroku is not found the it will use our local port 3000
 
 app.use(bodyParser.json()) //this is the middleware we give to express
 
@@ -97,7 +97,19 @@ app.patch("/todos/:id", (req, res) => {
 
 });
 
+//Signup a new user with email and passworld
+app.post("/users", (req, res) => {
+    const body = _.pick(req.body, ['email', 'password']); //this list out the properties we want the users to be able to use for siging up
+    const user = new User(body);
 
+    user.save().then(() => {//this save the user email and passworld to the database
+        return user.generateAuthToken();
+    }).then((token) => {
+        res.header("x-auth", token).send(user);
+    }).catch((e) => {
+        res.status(400).send(e);
+    })
+});
 
 
 app.listen(port, () => {
