@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 
 
-const UserSchma = new mongoose.Schema({ //this is used to declare the formate of our userdb
+const UserSchema = new mongoose.Schema({ //this is used to declare the formate of our userdb
     email: {
         type: String,
         required: true,
@@ -33,17 +33,17 @@ const UserSchma = new mongoose.Schema({ //this is used to declare the formate of
     }]
 });
 
-UserSchma.methods.toJSON = function(){
+UserSchema.methods.toJSON = function(){
     const user = this;
     const userObject = user.toObject() //this take in our mongoose user varible and connert it to a regular object so that we can access it props
 
     return _.pick(userObject, ['_id', 'email']); //this are this we want to pick from the user object
 };
 
-UserSchma.methods.generateAuthToken = function () { //we are using es5 fun because we want to use "this"
+UserSchema.methods.generateAuthToken = function () { //we are using es5 fun because we want to use "this"
 const user = this;
 const access = 'auth';
-const token = jwt.sign({_id: user._id.toHexString(), access}, "abc123").toString();
+const token = jwt.sign({ _id: user._id.toHexString(), access }, 'abc123').toString();
 
 user.tokens.push({access, token});
 return user.save().then(() => {
@@ -51,11 +51,29 @@ return user.save().then(() => {
 });
 };
 
-const User = mongoose.model("User", UserSchma);
+UserSchema.statics.findByToken = function(token) {
+    const User = this;
+    let decoded;
+    try {
+        decoded = jwt.verify(token, 'abc123');
+    } catch (e) {//thuis runs if the user token is not found
+        return Promise.reject()
+    }
+    return User.findOne({
+        '_id': decoded._id,
+        'tokens.token': token,
+        'tokens.access': 'auth'
+    });
+};
 
-const user1 = new User({
-    email: "adadsfa"
-});
+
+
+
+const User = mongoose.model("User", UserSchema);
+
+// const user1 = new User({
+//     email: "adadsfa"
+// });
 
 // user1.save().then((result) => {
 //     console.log(JSON.stringify(result, undefined, 2));

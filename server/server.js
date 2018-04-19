@@ -1,14 +1,15 @@
 require("./config/config"); //in the config file we configure different database for testing and development
 
 const _ = require("lodash");
-const { ObjectID } = require('mongodb'); //this contains all the valid id that mongoose accepts for our database
 const express = require('express');
+const { ObjectID } = require('mongodb'); //this contains all the valid id that mongoose accepts for our database
 const bodyParser = require('body-parser');
 
-const {mangoose} = require('./db/mongoose'); //this is the database
+const {mongoose} = require('./db/mongoose'); //this is the database
 // const { User } = require("./../server/models/user");
 const {Todo} = require('./models/todo');
-const { User} = require('./models/user');
+const {User} = require('./models/user');
+const {authenticate} = require("./middleware/authenticate");
 
 const app = express();
 const port = process.env.PORT || 3000; //this uses heroku if heroku is not found the it will use our local port 3000
@@ -103,13 +104,20 @@ app.post("/users", (req, res) => {
     const user = new User(body);
 
     user.save().then(() => {//this save the user email and passworld to the database
-        return user.generateAuthToken();
+        return user.generateAuthToken(); //this returns the user email address and id
     }).then((token) => {
         res.header("x-auth", token).send(user);
     }).catch((e) => {
         res.status(400).send(e);
     })
 });
+
+app.get("/users/me", authenticate, (req, res) => {
+    res.send(req.user);
+});
+
+
+
 
 
 app.listen(port, () => {
