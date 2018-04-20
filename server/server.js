@@ -132,6 +132,9 @@ app.post('/users/login', (req, res) => {
     });
 });
 
+//This is used to log the user out which can be done by deleting the usr token from the header
+app.delete('/users/me/token')
+
 
 app.listen(port, () => {
 console.log(`Started up at port ${port}`);
