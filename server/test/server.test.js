@@ -14,6 +14,7 @@ describe("POST /todos", () => {
         let text = "Test todo text";
         request(app)
             .post('/todos')
+            .set('x-auth', users[0].tokens[0].token)
             .send({ text })//this is the data we send to the db
             .expect(200) ///this is expect the status to be 200 
             .expect((res) => {
@@ -35,6 +36,7 @@ describe("POST /todos", () => {
     it("Should not create todo with invalid body data", (done) => {
         request(app)
             .post("/todos")
+            .set('x-auth', users[0].tokens[0].token)
             .send({})
             .expect(400)
             .end((err, res) => {
@@ -54,18 +56,20 @@ describe("GET /todos", () => {
     it("Should get all todos", (done) => {
         request(app)
             .get("/todos")
+            .set('x-auth', users[0].tokens[0].token)
             .expect(200)
             .expect((res) => {
-                expect(res.body.todos.lenght).toBe(2);
+                expect(res.body.todos.length).toBe(1);
             })
             .end(done);
     });
 });
 
-describe("GEt /todos/:id", () => {
+describe("GET /todos/:id", () => {
     it("Should return todo doc", (done) => {
         request(app)
             .get(`/todos/${todos[0]._id.toHexString()}`) //the .toHexString() converts the objects id to a string
+            .set('x-auth', users[0].tokens[0].token)
             .expect(200)
             .expect((res) => {
                 expect(res.body.todo.text).toBe(todos[0].text);
@@ -84,6 +88,7 @@ describe("GEt /todos/:id", () => {
     it("Shoud return 404 for non object IDs", (done) => {
         request(app)
             .get("/todos/123abc")
+            .set('x-auth', users[0].tokens[0].token)  
             .expect(404)
             .end(done);
     });

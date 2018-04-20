@@ -17,9 +17,10 @@ const port = process.env.PORT || 3000; //this uses heroku if heroku is not found
 app.use(bodyParser.json()) //this is the middleware we give to express
 
 //THE CODE BELOW SAVE THINGS TO THE DATABASE
-app.post('/todos', (req, res) => { //this is for creating todo we the user sends info to be saved in the db
+app.post('/todos', authenticate, (req, res) => { //this is for creating todo we the user sends info to be saved in the db
     const todo = new Todo({
-        text: req.body.text //this take in the data the user gave
+        text: req.body.text, //this take in the data the user gave
+        _creator: req.user._id //this brings out the todos associated with the authenticated user
     });
 
     todo.save().then((doc) => {
@@ -30,22 +31,27 @@ app.post('/todos', (req, res) => { //this is for creating todo we the user sends
 }),
 
 //THE CODE BELOW GET THINGS FROM THE DATABASE
-app.get("/todos", (req, res) => {
-    Todo.find().then((todos) => {
+app.get("/todos", authenticate, (req, res) => {
+    Todo.find({ //this find the todo that the user login created
+        _creator: req.user._id //this find the user todo that is associated with that authenticated user
+    }).then((todos) => {
         res.send({todos}); //this send the data found in the the screen(to the user)
     }, (e) => {
         res.status(400).send(e); //incase their is an err it is being send to the screen so that the user can read it
     })
-})
+});
 
 //GET /todos/databasedataid
-app.get("/todos/:id", (req, res) => { 
+app.get("/todos/:id", authenticate, (req, res) => { 
     // res.send(req.params)//this shows the value of the params objects on screen
     const id = req.params.id;
     if(!ObjectID.isValid(id)){ //this check if the id is valid
         return res.status(404).send(`the id ${id} is invalid`);
     }
-    Todo.findById(id).then((todo) => {
+    Todo.findOne({ //this is used to send the todo data to the user with id is on the todos in the db
+        _id: id,
+        _creator: req.user._id
+    }).then((todo) => {
         if(!todo) {
              res.status(404).send("The id is valid but not found")//this run if the id is a valid mongoose id but not correct
         }
@@ -55,13 +61,16 @@ app.get("/todos/:id", (req, res) => {
     })
 });
 
-//REMOVING DATA IN THE BD BY ID
-app.delete('/todos/:id', (req, res) => {
+//REMOVING DATA IN THE DB BY ID
+app.delete('/todos/:id', authenticate, (req, res) => {
     const id = req.params.id;
     if(!ObjectID.isValid(id)){
         return res.status(404).send(`The id ${id} is not valid`)
     }
-    Todo.findByIdAndRemove({_id: id}).then((todo) => {
+    Todo.findOneAndRemove({
+        _id: id,
+        _creator: req.user._id
+    }).then((todo) => {
         if(!todo){//this run if the todo id in valid but is not found which my be as a result of u deleting it before
             return res.status(404).send()
         }
