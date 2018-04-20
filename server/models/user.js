@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const validator = require("validator");
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
-
+const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({ //this is used to declare the formate of our userdb
     email: {
@@ -66,8 +66,21 @@ UserSchema.statics.findByToken = function(token) {
     });
 };
 
-
-
+//this code is used to hashed the user password before it is being save to the database here we are using mongoose middleware
+UserSchema.pre('save', function(next) {
+    const user = this;
+    if(user.isModified('password')) {
+        //the code below is used to hash our password
+        bcrypt.genSalt(10, (err, salt) => {
+            bcrypt.hash(user.password, salt, (err, hash) => {
+                user.password = hash; //this now set the user.password property in our db to be our hashed value
+            next(); //this is being call to complete this middleware so that the user can login
+            })
+        })
+    } else {
+        next();
+    }
+});
 
 const User = mongoose.model("User", UserSchema);
 

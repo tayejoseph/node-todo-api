@@ -112,6 +112,8 @@ app.post("/users", (req, res) => {
     })
 });
 
+
+//this is used to get the signed in user pass word
 app.get("/users/me", authenticate, (req, res) => {
     res.send(req.user);
 });
