@@ -99,7 +99,7 @@ app.patch("/todos/:id", authenticate, (req, res) => {
         _id: id,
         _creator: req.user._id    
     }, {$set: body}, {new: true  // with new set to be true it will return the updated value not the old one
-    }).then(() => {
+    }).then((todo) => {
         if(!todo){ //if todo does not exist
             return res.status(404).send();
         }
@@ -125,7 +125,7 @@ app.post("/users", (req, res) => {
 });
 
 
-//this is used to get the signed in user pass word
+//this is used to sign up user 
 app.get("/users/me", authenticate, (req, res) => {
     res.send(req.user);
 });
