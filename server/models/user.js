@@ -43,7 +43,8 @@ UserSchema.methods.toJSON = function(){
 UserSchema.methods.generateAuthToken = function () { //we are using es5 fun because we want to use "this"
 const user = this;
 const access = 'auth';
-const token = jwt.sign({ _id: user._id.toHexString(), access }, 'abc123').toString();
+//the process.env.JWT_SECRET is gotten from the config.json file it is used to make our app more secured
+const token = jwt.sign({ _id: user._id.toHexString(), access }, process.env.JWT_SECRET).toString();
 
 user.tokens.push({access, token});
 return user.save().then(() => {
@@ -64,7 +65,7 @@ UserSchema.statics.findByToken = function(token) {
     const User = this;
     let decoded;
     try {
-        decoded = jwt.verify(token, 'abc123');
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (e) {//thuis runs if the user token is not found
         return Promise.reject()
     }

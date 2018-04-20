@@ -81,7 +81,7 @@ app.delete('/todos/:id', authenticate, (req, res) => {
 });
 
 //UPDATING OUR TODOS
-app.patch("/todos/:id", (req, res) => { 
+app.patch("/todos/:id", authenticate, (req, res) => { 
     const id = req.params.id;
     const body = _.pick(req.body, ['text', 'completed']); //this is used to pick the properties we want the user to be able to update from our database
     if (!ObjectID.isValid(id)) {
@@ -95,7 +95,10 @@ app.patch("/todos/:id", (req, res) => {
         body.completedAt = null; //this removes the completed at value from the database
     }
 
-    Todo.findByIdAndUpdate(id, {$set: body}, {new: true  // with new set to be true it will return the updated value not the old one
+    Todo.findOneAndUpdate({
+        _id: id,
+        _creator: req.user._id    
+    }, {$set: body}, {new: true  // with new set to be true it will return the updated value not the old one
     }).then(() => {
         if(!todo){ //if todo does not exist
             return res.status(404).send();

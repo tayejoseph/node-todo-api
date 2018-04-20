@@ -13,7 +13,8 @@ const users = [{
     password: 'userOnePass',
     tokens: [{
         access: 'auth',
-        token: jwt.sign({_id: userOneId, access: 'auth'}, 'abc123').toString()
+        //the process.env.JWT_SECRET is gotten from our config file the is a jwt screte code for making our app more secured
+        token: jwt.sign({_id: userOneId, access: 'auth'}, process.env.JWT_SECRET).toString()
     }]
 }, {
     _id: userTwoId,
@@ -21,7 +22,7 @@ const users = [{
     password: "userTwoPass",
     tokens: [{
         access: 'auth',
-        token: jwt.sign({ _id: userTwoId, access: 'auth' }, 'abc123').toString()
+        token: jwt.sign({ _id: userTwoId, access: 'auth' }, process.env.JWT_SECRET).toString()
     }]
 }];
  
