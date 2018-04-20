@@ -66,6 +66,28 @@ UserSchema.statics.findByToken = function(token) {
     });
 };
 
+//this is a method that will be used to check if the username of the user logining in is is the database then it compare the password with the sorted hashed password in the database
+UserSchema.statics.findByCredentials = function(email, password){
+const User = this;
+return User.findOne({email}).then((user) =>{
+    if(!user){//this runs if this user email does not exist in the database
+        return Promise.reject(); //note promise is used here because the func is asych
+    }
+    //since the user email exist in our database now we want to compare the userpassword
+    //with the our sorted hashed password
+    return new Promise((resolve, reject) => {
+        bcrypt.compare(password, user.password, (err, res) => {
+            if(res){ //note the res value always return true if the password matched the sorted hashed password in the database
+                resolve(user); //this send back the user data 
+            } else { //this runs if the hashed password did not match
+                reject();
+            }
+        });
+    });
+});
+};
+
+
 //this code is used to hashed the user password before it is being save to the database here we are using mongoose middleware
 UserSchema.pre('save', function(next) {
     const user = this;

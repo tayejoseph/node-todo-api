@@ -118,8 +118,19 @@ app.get("/users/me", authenticate, (req, res) => {
     res.send(req.user);
 });
 
-
-
+//this is used to login users it take that username and password it now compare the password with the hashed passwrd in our db
+app.post('/users/login', (req, res) => {
+    const body = _.pick(req.body, ['email', 'password']);
+    //the findByCredentials is a method we wrote in user js
+    User.findByCredentials(body.email, body.password).then((user) =>{
+        //note the generatedAuthToken is defined as a method in the user file
+        user.generateAuthToken().then((token) => {
+            res.header('x-auth', token).send(user); //since the users name and the password match we naw set our respond header to a generated token and return back the user data
+        });
+    }).catch((e) => {//if the user email and password does not exist in the db
+        res.status(400).send();
+    });
+});
 
 
 app.listen(port, () => {
