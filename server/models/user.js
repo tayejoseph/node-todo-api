@@ -21,7 +21,7 @@ const UserSchema = new mongoose.Schema({ //this is used to declare the formate o
         require: true,
         minlength: 6
     },
-    tokens: [{
+    tokens: [{ //this token is used to log out the user
         access: {
             type: String,
             required: true
@@ -49,6 +49,15 @@ user.tokens.push({access, token});
 return user.save().then(() => {
     return token;
 });
+};
+
+UserSchema.methods.removeToken = function(token) {
+const user = this;
+return user.update({ //this used to remove a token from the user
+    $pull : {
+        tokens : { token }//this is pulling any token that is equal to the user token
+    }
+})
 };
 
 UserSchema.statics.findByToken = function(token) {
